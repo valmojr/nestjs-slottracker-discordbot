@@ -46,8 +46,6 @@ export class GuildService {
   async createGuild(guild: Guild): Promise<ClientGuild> {
     this.logger.warn(`Guild ${Guild.name} just added SlotTracker!`);
 
-    const guildMembers = await this.fetchUsers(guild);
-
     const { id, name, banner } = guild;
 
     return await this.databaseService.guild.create({
@@ -55,9 +53,6 @@ export class GuildService {
         id,
         name,
         thumbnail: banner,
-        members: {
-          create: guildMembers,
-        },
       },
     });
   }
