@@ -4,14 +4,24 @@ import { DiscordController } from './discord.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NecordModule } from 'necord';
 import { DiscordConfigService } from './discord.config.service';
+import { DatabaseService } from 'src/database/database.service';
+import { GuildModule } from 'src/guild/guild.module';
+import { GuildService } from 'src/guild/guild.service';
+
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     NecordModule.forRootAsync({
       useClass: DiscordConfigService,
     }),
+    GuildModule,
   ],
   controllers: [DiscordController],
-  providers: [DiscordService, DiscordConfigService],
+  providers: [
+    DiscordService,
+    DiscordConfigService,
+    DatabaseService,
+    GuildService,
+  ],
 })
 export class DiscordModule {}
