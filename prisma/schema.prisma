@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id          String  @id @unique
+  title       String
+  description String
+  thumbnail   String?
+  members     User[]
+  events      Event[]
+}
+
+model Event {
+  id          String   @id @unique
+  title       String
+  description String
+  thumbnail   String?
+  groups      Group[]
+  starts_at   DateTime
+  ends_at     DateTime
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  owner       User[]
+  guildId     String
+  guild       Guild    @relation(fields: [guildId], references: [id])
+}
+
+model Group {
+  id      String @id @unique
+  name    String
+  roles   Role[]
+  event   Event  @relation(fields: [eventId], references: [id])
+  eventId String
+}
+
+model Role {
+  id           String @id @unique
+  name         String
+  group        Group  @relation(fields: [groupId], references: [id])
+  groupId      String
+  assignedUser User   @relation(fields: [userId], references: [id])
+  userId       String
+}
+
+model User {
+  id            String  @id @unique
+  username      String
+  avatar        String
+  assignedRoles Role[]
+  ownedEvents   Event[]
+  accessToken   String?
+  refreshToken  String?
+  guilds        Guild[]
+}
+
+model Session {
+  id        String   @id @unique
+  expiredAt DateTime
+  json      String
+}
