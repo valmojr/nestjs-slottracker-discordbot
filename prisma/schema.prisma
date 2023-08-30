@@ -11,11 +11,13 @@ datasource db {
 }
 
 model Guild {
-  id        String  @id @unique
-  name      String
-  thumbnail String?
-  members   User[]
-  events    Event[]
+  id             String  @id @unique
+  name           String
+  description    String?
+  icon           String?
+  eventChannelId String?
+  members        User[]
+  events         Event[]
 }
 
 model Event {
