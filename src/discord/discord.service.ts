@@ -30,7 +30,6 @@ export class DiscordService {
     const guildMembers = await this.guildService.fetchUsers(guild);
 
     guildMembers.forEach(async (member) => {
-      this.logger.log(member);
       await this.userService.createOrUpdateUser(member);
       await this.userService.addUserToGuild(member, guild);
     });
@@ -61,6 +60,11 @@ export class DiscordService {
 
   @On('userAvatarUpdate')
   async onUserAvatarUpdate(@Context() [user]: ContextOf<'userAvatarUpdate'>) {
+    this.userService.createOrUpdateUser(user);
+  }
+
+  @On('userUpdate')
+  async onUserUpdate(@Context() [user]: ContextOf<'userUpdate'>) {
     this.userService.createOrUpdateUser(user);
   }
 }

@@ -5,6 +5,7 @@ import {
   GuildMember,
   PartialGuildMember,
   User as DiscordUser,
+  PartialUser,
 } from 'discord.js';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -33,17 +34,17 @@ export class UserService {
     id,
     username,
     avatar,
-  }: User | DiscordUser): Promise<User> {
-    const existingUser = this.databaseService.user.findUnique({
+  }: User | DiscordUser | PartialUser): Promise<User> {
+    const existingUser = await this.databaseService.user.findUnique({
       where: { id },
     });
 
     return existingUser
-      ? this.databaseService.user.update({
+      ? await this.databaseService.user.update({
           data: { id, username, avatar },
           where: { id },
         })
-      : this.databaseService.user.create({
+      : await this.databaseService.user.create({
           data: { id, username, avatar },
         });
   }

@@ -12,13 +12,17 @@ export class GuildService {
   async fetchUsers(guild: Guild): Promise<User[]> {
     this.logger.log(`Fetching Guild ${guild.name} members`);
 
-    const guildMembers = await guild.members.fetch();
+    await guild.members.fetch();
 
-    return guildMembers.map((member) => {
+    const guildMembers = guild.members.cache;
+
+    return guildMembers.map(({ user }) => {
+      const { id, username, avatar } = user;
+
       return {
-        id: member.id,
-        username: member.nickname,
-        avatar: member.avatar,
+        id,
+        username,
+        avatar,
         accessToken: undefined,
         refreshToken: undefined,
       };
@@ -26,7 +30,7 @@ export class GuildService {
   }
 
   async createGuild(guild: Guild): Promise<ClientGuild> {
-    this.logger.warn(`Guild ${Guild.name} just added SlotTracker!`);
+    this.logger.warn(`Guild ${guild.name} just added SlotTracker!`);
 
     const { id, name, description, icon } = guild;
 
