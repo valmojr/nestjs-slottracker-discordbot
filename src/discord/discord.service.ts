@@ -30,6 +30,7 @@ export class DiscordService {
     const guildMembers = await this.guildService.fetchUsers(guild);
 
     guildMembers.forEach(async (member) => {
+      this.logger.log(member);
       await this.userService.createOrUpdateUser(member);
       await this.userService.addUserToGuild(member, guild);
     });

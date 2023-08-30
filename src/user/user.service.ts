@@ -12,22 +12,20 @@ import { DatabaseService } from 'src/database/database.service';
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async createOrUpdateGuildMember({
-    id,
-    nickname,
-    avatar,
-  }: GuildMember): Promise<User> {
+  async createOrUpdateGuildMember({ user }: GuildMember): Promise<User> {
+    const { id, username, avatar } = user;
+
     const existingUser = this.databaseService.user.findUnique({
       where: { id },
     });
 
     return existingUser
       ? this.databaseService.user.update({
-          data: { id, username: nickname, avatar },
+          data: { id, username, avatar },
           where: { id },
         })
       : this.databaseService.user.create({
-          data: { id, username: nickname, avatar },
+          data: { id, username, avatar },
         });
   }
 
@@ -51,15 +49,20 @@ export class UserService {
   }
 
   async addGuildMemberToGuild(
-    { id, nickname, avatar }: GuildMember,
+    { user }: GuildMember,
     guild: Guild,
   ): Promise<ClientGuild> {
+    const { id, username, avatar } = user;
     return await this.databaseService.guild.update({
       data: {
         members: {
           connectOrCreate: {
             where: { id },
-            create: { id, username: nickname, avatar },
+            create: {
+              id,
+              username,
+              avatar,
+            },
           },
         },
       },
