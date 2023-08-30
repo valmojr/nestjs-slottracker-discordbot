@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { Guild, GuildMember } from 'discord.js';
+import { Guild } from 'discord.js';
 import { Guild as ClientGuild } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -25,76 +25,23 @@ export class GuildService {
     });
   }
 
-  async upsertMembers(guild: Guild) {
-    this.logger.log(`Upserting Guild ${guild.name}`);
-
-    const guildUsers = await this.fetchUsers(guild);
-
-    return guildUsers.map(({ id, username, avatar }) =>
-      this.databaseService.user.upsert({
-        create: {
-          id,
-          username,
-          avatar,
-        },
-        update: { username, avatar },
-        where: { id },
-      }),
-    );
-  }
-
   async createGuild(guild: Guild): Promise<ClientGuild> {
     this.logger.warn(`Guild ${Guild.name} just added SlotTracker!`);
 
-    const { id, name, banner } = guild;
+    const { id, name, description, icon } = guild;
 
     return await this.databaseService.guild.create({
       data: {
         id,
         name,
-        thumbnail: banner,
+        description,
+        icon,
       },
     });
   }
 
-  async removeGuild({ id }: Guild): Promise<ClientGuild> {
-    this.logger.warn(`Guild ${Guild.name} just removed SlotTracker!`);
+  async removeGuild({ id, name }: Guild): Promise<ClientGuild> {
+    this.logger.warn(`Guild ${name} just removed SlotTracker!`);
     return await this.databaseService.guild.delete({ where: { id } });
-  }
-
-  async removeGuildMemberFromGuild(
-    guildMember: GuildMember,
-    guild: Guild,
-  ): Promise<ClientGuild> {
-    return this.databaseService.guild.update({
-      data: {
-        members: {
-          delete: guildMember,
-        },
-      },
-      where: {
-        id: guild.id,
-      },
-    });
-  }
-
-  async addGuildMemberToGuild(
-    guildMember: GuildMember,
-    guild: Guild,
-  ): Promise<ClientGuild> {
-    const user = {
-      id: guildMember.id,
-      username: guildMember.nickname,
-      avatar: guildMember.avatar,
-    };
-
-    return await this.databaseService.guild.update({
-      data: {
-        members: {
-          create: user,
-        },
-      },
-      where: { id: guild.id },
-    });
   }
 }
