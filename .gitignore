@@ -36,4 +36,6 @@ lerna-debug.log*
 
 .env
 
+prisma/migrations
+
 package-lock.json
