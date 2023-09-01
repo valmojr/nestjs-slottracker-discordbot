@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Once, Context, ContextOf, On } from 'necord';
+import { EventService } from 'src/event/event.service';
 import { GuildService } from 'src/guild/guild.service';
 import { UserService } from 'src/user/user.service';
 
@@ -8,6 +9,7 @@ export class DiscordService {
   constructor(
     private readonly guildService: GuildService,
     private readonly userService: UserService,
+    private readonly eventService: EventService,
   ) {}
   private readonly logger = new Logger(DiscordService.name);
 
@@ -66,5 +68,47 @@ export class DiscordService {
   @On('userUpdate')
   async onUserUpdate(@Context() [user]: ContextOf<'userUpdate'>) {
     this.userService.createOrUpdateUser(user);
+  }
+
+  @On('guildScheduledEventCreate')
+  async onGuildScheduledEventCreate(
+    @Context() [event]: ContextOf<'guildScheduledEventCreate'>,
+  ) {
+    // TODO - Check if the event is a SlotTracker Event (it must be on DB)
+    // Create the Forum Post for the event to show de information needed and tag all the assigned users to their roles
+  }
+
+  @On('guildScheduledEventUpdate')
+  async onGuildScheduledEventUpdate(
+    @Context() [event]: ContextOf<'guildScheduledEventUpdate'>,
+  ) {
+    // TODO - Check first if its on ST
+
+    this.eventService.updateEvent(event);
+  }
+
+  @On('guildScheduledEventUserAdd')
+  async onGuildScheduledEventUserAdd(
+    @Context() [event, user]: ContextOf<'guildScheduledEventUserAdd'>,
+  ) {
+    // TODO - Check if the event is a SlotTracker Event (it must be on DB)
+    // TODO - Check if user is assigned to a role in SlotTracker, if not, remove it from the event
+  }
+
+  @On('guildScheduledEventDelete')
+  async onGuildScheduledEventUserDelete(
+    @Context() [event]: ContextOf<'guildScheduledEventDelete'>,
+  ) {
+    // We cannot prevent it from deleting the discord event
+    // TODO - Add a 'Cancelled' on the end of the Forum Post title
+    this.eventService.deleteEvent(event.id);
+  }
+
+  @On('guildScheduledEventUserRemove')
+  async onGuildScheduledEventUserRemove(
+    @Context() [event, user]: ContextOf<'guildScheduledEventUserRemove'>,
+  ) {
+    // TODO - Check if the event is a SlotTracker Event (it must be on DB)
+    // TODO - Check if user is assigned to a role in SlotTracker, if not, remove it from the event
   }
 }

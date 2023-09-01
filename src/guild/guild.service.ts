@@ -48,4 +48,10 @@ export class GuildService {
     this.logger.warn(`Guild ${name} just removed SlotTracker!`);
     return await this.databaseService.guild.delete({ where: { id } });
   }
+
+  async getAvaliableGuildsFromUser(id: string) {
+    return await this.databaseService.guild.findMany({
+      where: { members: { every: { id } } },
+    });
+  }
 }
