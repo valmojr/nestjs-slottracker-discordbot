@@ -44,6 +44,18 @@ export class GuildService {
     });
   }
 
+  async find(guildOrGuildId: string | Guild) {
+    if (typeof guildOrGuildId === 'string') {
+      return this.databaseService.guild.findUnique({
+        where: { id: guildOrGuildId },
+      });
+    } else {
+      return this.databaseService.guild.findUnique({
+        where: { id: guildOrGuildId.id },
+      });
+    }
+  }
+
   async removeGuild({ id, name }: Guild): Promise<ClientGuild> {
     this.logger.warn(`Guild ${name} just removed SlotTracker!`);
     return await this.databaseService.guild.delete({ where: { id } });
