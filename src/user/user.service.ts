@@ -71,6 +71,22 @@ export class UserService {
     });
   }
 
+  async findGuildMemberOnGuild(
+    { id }: GuildMember | PartialGuildMember | DiscordUser,
+    guild: ClientGuild,
+  ) {
+    return this.databaseService.user.findUnique({
+      where: {
+        id,
+        guilds: {
+          some: {
+            id: guild.id,
+          },
+        },
+      },
+    });
+  }
+
   async removeGuildMemberFromGuild(
     { id }: GuildMember | PartialGuildMember,
     guild: Guild,
