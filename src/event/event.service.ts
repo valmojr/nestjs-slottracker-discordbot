@@ -41,6 +41,15 @@ export class EventService {
       },
     });
   }
+
+  async findEvent(event: GuildScheduledEvent<GuildScheduledEventStatus>) {
+    return this.databaseService.event.findUnique({
+      where: {
+        id: event.id,
+      },
+    });
+  }
+
   async deleteEvent(eventOrEventId: Event | string) {
     typeof eventOrEventId === 'string'
       ? this.databaseService.event.delete({ where: { id: eventOrEventId } })
