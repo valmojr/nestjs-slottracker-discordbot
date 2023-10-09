@@ -74,25 +74,44 @@ export class DiscordService {
   async onGuildScheduledEventCreate(
     @Context() [event]: ContextOf<'guildScheduledEventCreate'>,
   ) {
-    // TODO - Check if the event is a SlotTracker Event (it must be on DB)
-    // Create the Forum Post for the event to show de information needed and tag all the assigned users to their roles
+    const databaseEvent = !!this.eventService.findEvent(event);
+    if (!databaseEvent) {
+      this.eventService.createEvent(event);
+    }
   }
 
   @On('guildScheduledEventUpdate')
   async onGuildScheduledEventUpdate(
     @Context() [event]: ContextOf<'guildScheduledEventUpdate'>,
   ) {
-    // TODO - Check first if its on ST
-
-    this.eventService.updateEvent(event);
+    const databaseEvent = !!this.eventService.findEvent(event);
+    if (databaseEvent) {
+      this.eventService.updateEvent(event);
+    }
   }
 
   @On('guildScheduledEventUserAdd')
   async onGuildScheduledEventUserAdd(
     @Context() [event, user]: ContextOf<'guildScheduledEventUserAdd'>,
   ) {
-    // TODO - Check if the event is a SlotTracker Event (it must be on DB)
-    // TODO - Check if user is assigned to a role in SlotTracker, if not, remove it from the event
+    const databaseEvent = !!this.eventService.findEvent(event);
+    const databaseUser = !!this.userService.findGuildMemberOnGuild(
+      user,
+      await this.guildService.find(event.guild),
+    );
+
+    if (!databaseEvent) {
+      const message = `Event ${event.name} was not found in the Database`;
+      this.logger.warn(message);
+      throw new Error(message);
+    }
+    if (!databaseUser) {
+      const message = `User ${user.globalName} was not found in the Database`;
+      this.logger.warn(message);
+      throw new Error(message);
+    }
+
+    // TODO - Add "You are not assigned to any role in this event, you can assign yourself on XXX"/"This event is fully sloted"
   }
 
   @On('guildScheduledEventDelete')
