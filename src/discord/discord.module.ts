@@ -8,6 +8,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { GuildModule } from 'src/guild/guild.module';
 import { GuildService } from 'src/guild/guild.service';
 import { UserService } from 'src/user/user.service';
+import { EventService } from 'src/event/event.service';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UserService } from 'src/user/user.service';
     DatabaseService,
     GuildService,
     UserService,
+    EventService,
   ],
 })
 export class DiscordModule {}
