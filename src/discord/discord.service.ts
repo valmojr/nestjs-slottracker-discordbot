@@ -74,6 +74,8 @@ export class DiscordService {
   async onGuildScheduledEventCreate(
     @Context() [event]: ContextOf<'guildScheduledEventCreate'>,
   ) {
+    this.logger.log(`Event ${event.name} created in Guild ${event.guild.name}`);
+    // Just won't be logged when i create a event
     const databaseEvent = !!this.eventService.findEvent(event);
     if (!databaseEvent) {
       this.eventService.createEvent(event);
@@ -128,6 +130,21 @@ export class DiscordService {
     @Context() [event, user]: ContextOf<'guildScheduledEventUserRemove'>,
   ) {
     // TODO - Check if the event is a SlotTracker Event (it must be on DB)
+    const databaseEvent = !!this.eventService.findEvent(event);
+    const databaseUser = !!this.userService.findGuildMemberOnGuild(
+      user,
+      await this.guildService.find(event.guild),
+    );
+    if (!databaseEvent) {
+      const message = `Event ${event.name} was not found in the Database`;
+      this.logger.warn(message);
+      throw new Error(message);
+    }
+    if (!databaseUser) {
+      const message = `User ${user.globalName} was not found in the Database`;
+      this.logger.warn(message);
+      throw new Error(message);
+    }
     // TODO - Check if user is assigned to a role in SlotTracker, if not, remove it from the event
   }
 }
